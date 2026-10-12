@@ -58,6 +58,8 @@
     <string name="pref_fullscreen">Fullscreen</string>
     <string name="pref_fullscreen_summary">Toggle immersive mode in your device display</string>
     <string name="pref_forceOrientation">Screen orientation</string>
+    <string name="pref_ignoreRotationLock">Ignore device rotation lock</string>
+    <string name="pref_ignoreRotationLock_summary">Rotate by the orientation sensor even when the device rotation lock (auto-rotate off) is enabled. Only applies when Screen orientation is set to auto.</string>
     <string name="pref_hideCutout">Hide display cutout (if any)</string>
     <string name="pref_keepScreenOn">Keep Screen On</string>
 
@@ -120,6 +122,9 @@
     <string name="pref_notificationButton0Action">Notification first button</string>
     <string name="pref_notificationButton1Action">Notification second button</string>
     <string name="pref_mediaKeysAction">Media keys</string>
+
+    <string name="no_action_volume_hint">android volume control</string>
+    <string name="no_action_media_hint">android media control</string>
 
     <string name="pref_summary_requiresExactOrCustom">Requires "display resolution mode" to be "exact" or "custom"</string>
     <string name="pref_summary_requiresIntercepting">Requires intercepting system shortcuts with Dex mode or with Accessibility service</string>

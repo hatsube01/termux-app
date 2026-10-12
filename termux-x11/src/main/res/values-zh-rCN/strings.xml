@@ -39,6 +39,8 @@
     <string name="pref_fullscreen">全屏</string>
     <string name="pref_fullscreen_summary">在设备显示屏中切换沉浸式模式</string>
     <string name="pref_forceOrientation">屏幕方向</string>
+    <string name="pref_ignoreRotationLock">忽略设备方向锁定</string>
+    <string name="pref_ignoreRotationLock_summary">即使设备已开启方向锁定（关闭自动旋转），仍按方向传感器自动旋转屏幕。仅当「屏幕方向」设为「自动」时生效。</string>
     <string name="pref_hideCutout">尽可能隐藏屏幕刘海</string>
     <string name="pref_keepScreenOn">保持屏幕长亮</string>
 
@@ -95,12 +97,15 @@
     <string name="pref_swipeUpAction">三指向上滑动</string>
     <string name="pref_swipeDownAction">三指向下滑动</string>
     <string name="pref_volumeUpAction">增加音量</string>
-    <string name="pref_volumeDownAction">V降低音量</string>
+    <string name="pref_volumeDownAction">降低音量</string>
     <string name="pref_backButtonAction">返回键</string>
     <string name="pref_notificationTapAction">通知点击</string>
     <string name="pref_notificationButton0Action">通知第一按钮</string>
     <string name="pref_notificationButton1Action">通知第二按钮</string>
     <string name="pref_mediaKeysAction">媒体键</string>
+
+    <string name="no_action_volume_hint">系统音量控制</string>
+    <string name="no_action_media_hint">系统媒体控制</string>
 
     <string name="pref_summary_requiresExactOrCustom">显示分辨率模式为 真实 或 自定义</string>
     <string name="pref_summary_requiresIntercepting">使用 Dex 模式或辅助功能服务拦截系统快捷方式</string>

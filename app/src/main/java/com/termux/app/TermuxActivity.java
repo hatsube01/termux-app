@@ -269,7 +269,7 @@ public class TermuxActivity extends com.termux.x11.MainActivity implements Servi
                 return true;
             }
 //            ev.offsetLocation(0, -ScreenUtils.getStatusHeight());
-            inputControlsView.handleTouchEvent(ev);
+            inputControlsView.onTouchEvent(ev);
 //            ev.offsetLocation(0, ScreenUtils.getStatusHeight());
             return true;
         }

@@ -221,4 +221,9 @@
         <item>Image</item>
         <item>Solid Color</item>
     </string-array>
+    <string-array name="touchpad_mode_entries">
+        <item>CP1 Direct touch</item>
+        <item>CP2 Direct touch（RA2)</item>
+        <item>V3(Dark)</item>
+    </string-array>
 </resources>

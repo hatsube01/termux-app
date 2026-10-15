@@ -10,6 +10,7 @@ import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -585,8 +586,16 @@ public class TermuxTerminalViewClient extends TermuxTerminalViewClientBase {
             if (isStartup && mActivity.isOnResumeAfterOnCreate())
                 mShowSoftKeyboardWithDelayOnce = true;
         } else {
-            // Set flag to automatically push up TerminalView when keyboard is opened instead of showing over it
-            KeyboardUtils.setSoftInputModeAdjustResize(mActivity);
+            // Set flag to automatically push up TerminalView when keyboard is opened instead of showing over it.
+            // When running as an X11 host and the "resize screen on soft keyboard" preference (Reseed) is
+            // disabled, keep SOFT_INPUT_ADJUST_PAN so the X11 display is not shrunk by the keyboard.
+            if (mActivity instanceof com.termux.x11.MainActivity
+                && com.termux.x11.MainActivity.prefs != null
+                && !com.termux.x11.MainActivity.prefs.Reseed.get()) {
+                mActivity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+            } else {
+                KeyboardUtils.setSoftInputModeAdjustResize(mActivity);
+            }
 
             // Clear any previous flags to disable soft keyboard in case setting updated
             KeyboardUtils.clearDisableSoftKeyboardFlags(mActivity);

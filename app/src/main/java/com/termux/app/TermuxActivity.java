@@ -29,6 +29,7 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.InputDevice;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -976,6 +977,44 @@ public class TermuxActivity extends com.termux.x11.MainActivity implements Servi
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Intercept volume keys at the Activity level so that, when the Termux terminal view is
+     * showing and the volume key's configured user action is {@code trigger terminal input},
+     * pressing the volume key switches back to the X11 display.
+     *
+     * This is required because once the terminal view has focus, volume keys are routed to the
+     * terminal view rather than the X11 {@link com.termux.x11.input.TouchInputHandler}, so the
+     * X11-side handling never sees them. Intercepting here (the earliest dispatch point) makes
+     * the "second press closes the terminal" behaviour deterministic.
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (mMainContentView != null
+                && mMainContentView.isTerminalViewOpen()
+                && volumeKeyTriggersTerminalInput(keyCode)) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    mMainContentView.toggleTerminalView();
+                }
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    /** @return true when the given volume key's user action is {@code trigger terminal input}. */
+    private boolean volumeKeyTriggersTerminalInput(int keyCode) {
+        try {
+            String action = (keyCode == KeyEvent.KEYCODE_VOLUME_UP)
+                ? com.termux.x11.MainActivity.prefs.volumeUpAction.asList().get()
+                : com.termux.x11.MainActivity.prefs.volumeDownAction.asList().get();
+            return "trigger terminal input".equals(action);
+        } catch (Exception e) {
+            return false;
         }
     }
 

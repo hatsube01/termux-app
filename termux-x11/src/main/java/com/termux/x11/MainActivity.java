@@ -839,35 +839,36 @@ public class MainActivity extends LoriePreferences {
         if (getRequestedOrientation() != requestedOrientation)
             setRequestedOrientation(requestedOrientation);
 
-        if (hasFocus) {
-            if (SDK_INT >= VERSION_CODES.P) {
-                if (hideCutout)
-                    getWindow().getAttributes().layoutInDisplayCutoutMode = (SDK_INT >= VERSION_CODES.R) ?
-                        LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS :
-                        LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-                else
-                    getWindow().getAttributes().layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
+        if (SDK_INT >= VERSION_CODES.P) {
+            if (hideCutout) {
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.layoutInDisplayCutoutMode = (SDK_INT >= VERSION_CODES.R) ?
+                    LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS :
+                    LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+                window.setAttributes(attrs);
+            } else {
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT;
+                window.setAttributes(attrs);
             }
-
-            window.setStatusBarColor(Color.BLACK);
-            window.setNavigationBarColor(Color.BLACK);
         }
 
+        window.setStatusBarColor(Color.BLACK);
+        window.setNavigationBarColor(Color.BLACK);
+
         window.setFlags(FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS | FLAG_KEEP_SCREEN_ON | FLAG_TRANSLUCENT_STATUS, 0);
-        if (hasFocus) {
-            if (fullscreen) {
-                window.addFlags(FLAG_FULLSCREEN);
-                decorView.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-            } else {
-                window.clearFlags(FLAG_FULLSCREEN);
-                decorView.setSystemUiVisibility(0);
-            }
+        if (fullscreen || hideCutout) {
+            window.addFlags(FLAG_FULLSCREEN);
+            decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        } else {
+            window.clearFlags(FLAG_FULLSCREEN);
+            decorView.setSystemUiVisibility(0);
         }
 
         if (prefs.keepScreenOn.get())

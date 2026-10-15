@@ -4,11 +4,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceScreen app:key="main" app:title="@string/pref_main">
         <Preference app:title="@string/pref_output" app:fragment="output" />
+        <Preference app:key="open_progress_manager" android:title="@string/progress_manager" />
+        <Preference app:key="select_controller" android:title="@string/select_controller"/>
         <Preference app:title="@string/pref_pointer" app:fragment="pointer" />
         <Preference app:title="@string/pref_kbd" app:fragment="kbd" />
         <Preference app:title="@string/pref_other" app:fragment="other" />
-        <Preference app:key="select_controller" android:title="@string/select_controller"/>
-        <Preference app:key="open_progress_manager" android:title="@string/progress_manager" />
         <Preference app:key="version" app:title="@string/pref_version" />
     </PreferenceScreen>
     <PreferenceScreen app:key="output">

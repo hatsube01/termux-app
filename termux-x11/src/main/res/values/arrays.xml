@@ -68,6 +68,10 @@
       TouchInputHandler switches on). userActionsEntries holds the DISPLAYED text and is
       the one that gets localized in values-<locale>/arrays.xml. Keep both in sync:
       same item count, same order.
+
+      注意：不要用 <item>@array/xxx</item> 这种嵌套数组引用。aapt2 不会展开它，
+      运行时 Resources.getTextArray() 会返回 [null, "send volume up"]，
+      「增加音量 / 降低音量 / 媒体键」的下拉里就只剩一个可选项。条目必须写全。
     -->
     <string-array name="userActionsValues">
         <item>no action</item>
@@ -92,29 +96,78 @@
         <item>trigger terminal input</item>
     </string-array>
     <string-array name="userActionsVolumeDownValues">
-        <item>@array/userActionsValues</item>
+        <item>no action</item>
+        <item>toggle soft keyboard</item>
+        <item>toggle additional key bar</item>
+        <item>open preferences</item>
+        <item>release pointer and keyboard capture</item>
+        <item>toggle fullscreen</item>
+        <item>restart activity</item>
+        <item>exit</item>
+        <item>trigger terminal input</item>
         <item>send volume down</item>
     </string-array>
     <string-array name="userActionsVolumeDownEntries">
-        <item>@array/userActionsEntries</item>
+        <item>no action</item>
+        <item>toggle soft keyboard</item>
+        <item>toggle additional key bar</item>
+        <item>open preferences</item>
+        <item>release pointer and keyboard capture</item>
+        <item>toggle fullscreen</item>
+        <item>restart activity</item>
+        <item>exit</item>
+        <item>trigger terminal input</item>
         <item>send volume down</item>
     </string-array>
     <string-array name="userActionsVolumeUpValues">
-        <item>@array/userActionsValues</item>
+        <item>no action</item>
+        <item>toggle soft keyboard</item>
+        <item>toggle additional key bar</item>
+        <item>open preferences</item>
+        <item>release pointer and keyboard capture</item>
+        <item>toggle fullscreen</item>
+        <item>restart activity</item>
+        <item>exit</item>
+        <item>trigger terminal input</item>
         <item>send volume up</item>
     </string-array>
     <string-array name="userActionsVolumeUpEntries">
-        <item>@array/userActionsEntries</item>
+        <item>no action</item>
+        <item>toggle soft keyboard</item>
+        <item>toggle additional key bar</item>
+        <item>open preferences</item>
+        <item>release pointer and keyboard capture</item>
+        <item>toggle fullscreen</item>
+        <item>restart activity</item>
+        <item>exit</item>
+        <item>trigger terminal input</item>
         <item>send volume up</item>
     </string-array>
     <string-array name="userActionsMediaKeyValues">
-        <item>@array/userActionsValues</item>
+        <item>no action</item>
+        <item>toggle soft keyboard</item>
+        <item>toggle additional key bar</item>
+        <item>open preferences</item>
+        <item>release pointer and keyboard capture</item>
+        <item>toggle fullscreen</item>
+        <item>restart activity</item>
+        <item>exit</item>
+        <item>trigger terminal input</item>
         <item>send media action</item>
     </string-array>
     <string-array name="userActionsMediaKeyEntries">
-        <item>@array/userActionsEntries</item>
+        <item>no action</item>
+        <item>toggle soft keyboard</item>
+        <item>toggle additional key bar</item>
+        <item>open preferences</item>
+        <item>release pointer and keyboard capture</item>
+        <item>toggle fullscreen</item>
+        <item>restart activity</item>
+        <item>exit</item>
+        <item>trigger terminal input</item>
         <item>send media action</item>
     </string-array>
+
     <string-array name="forceOrientationVariants">
         <item>auto</item>
         <item>portrait</item>

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
@@ -1034,15 +1035,23 @@ public class ControlElement {
         int margin = automargin ? (int)(snappingSize * (shape == Shape.CIRCLE || shape == Shape.SQUARE ? 2.0f : 1.0f) * scale) : 0;
         int halfSize = (int)((Math.min(width, height) - margin) * 0.5f * iconScale);
         int oldAlpha = paint.getAlpha();
+        ColorFilter oldColorFilter = paint.getColorFilter();
         float opacity = iconOpacity;
-        // 内置图标原色显示，按压时以透明度减半作为反馈（自定义图标保持原样）
-        if (!isCustomIcon && propertyFlags.isSet(FLAG_PRESSED)) opacity *= 0.5f;
+        // 内置图标都是纯黑剪影，必须按按钮的颜色（默认白）和不透明度着色，否则在深色画面上就是一团黑；
+        // 自定义图标是用户自己的图，保留原色不动
+        if (!isCustomIcon) {
+            paint.setColorFilter(inputControlsView.getLightColorFilter());
+            opacity *= Color.alpha(getLightColor()) / 255.0f;
+            // 按压时以透明度减半作为反馈（自定义图标保持原样）
+            if (propertyFlags.isSet(FLAG_PRESSED)) opacity *= 0.5f;
+        }
         paint.setAlpha((int)(Mathf.clamp(opacity, 0.0f, 1.0f) * 255));
 
         Rect srcRect = new Rect(0, 0, icon.getWidth(), icon.getHeight());
         Rect dstRect = new Rect((int)(cx - halfSize), (int)(cy - halfSize), (int)(cx + halfSize), (int)(cy + halfSize));
         canvas.drawBitmap(icon, srcRect, dstRect, paint);
         paint.setAlpha(oldAlpha);
+        paint.setColorFilter(oldColorFilter);
     }
 
     public JSONObject toJSONObject() {

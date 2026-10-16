@@ -37,3 +37,7 @@ local.properties
 .swp
 ehthumbs.db
 Thumbs.db
+
+# local build/test logs
+build.log
+test.log

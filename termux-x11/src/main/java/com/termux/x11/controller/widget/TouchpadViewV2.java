@@ -218,8 +218,11 @@ public class TouchpadViewV2 extends View implements View.OnCapturedPointerListen
                 }
                 scrollAccumY = 0;
                 scrolling = false;
+                // 同一个 DOWN 可能被投递两次（TermuxActivity.sendTouchEvent 手动分发 + 视图正常分发各一次）。
+                // 重复计数会让 numFingers 虚高到 3+，handleFingerMove 里 numFingers <= 2 的判断失效，
+                // 之后单指拖动就再也推不动光标了
+                if (fingers[pointerId] == null) numFingers++;
                 fingers[pointerId] = new Finger(event.getX(actionIndex), event.getY(actionIndex));
-                numFingers++;
                 if (numFingers == 2 && pinchZoomEnabled) {
                     Finger f1 = null, f2 = null;
                     for (byte i = 0; i < MAX_FINGERS; i++) {

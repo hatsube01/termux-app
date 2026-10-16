@@ -348,9 +348,15 @@ public class LorieView extends SurfaceView implements InputStub {
         return renderer;
     }
 
-    /** 指针被锁定时视为相对鼠标移动模式（winlator 语义） */
+    /**
+     * winlator 的「相对鼠标移动」模式在终端侧没有对应开关，恒为关闭。
+     * 不能用 cursorLocker 代替：两者语义相反（winlator 里开启相对鼠标移动时反而会关掉光标锁定），
+     * 而且终端侧没有 Windows 端 winhandler 的相对鼠标通路——一旦返回 true，
+     * 触摸板移动会改走 WinHandler.mouseEvent()，光标会彻底不动。
+     * 移植前的实现同样是直接走 injectPointerMoveDelta，这里保持原语义。
+     */
     public boolean isRelativeMouseMovement() {
-        return cursorLocker != null && cursorLocker.isEnabled();
+        return false;
     }
     public CursorLocker cursorLocker;
     public WinHandler winHandler;

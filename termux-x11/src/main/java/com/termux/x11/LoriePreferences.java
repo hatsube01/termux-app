@@ -9,6 +9,7 @@ import static android.system.Os.getuid;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -20,6 +21,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.ContentObserver;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -38,10 +40,13 @@ import android.view.Display;
 import android.view.InputDevice;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,10 +59,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.Preference.OnPreferenceChangeListener;
 import androidx.preference.PreferenceDataStore;
+import androidx.preference.PreferenceDialogFragmentCompat;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SeekBarPreference;
@@ -701,7 +708,65 @@ public class LoriePreferences extends AppCompatActivity implements PreferenceFra
                     .setNegativeButton("Cancel", (dialog, whichButton) -> dialog.dismiss())
                     .create()
                     .show();
-            } else super.onDisplayPreferenceDialog(preference);
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+                if (preference instanceof ListPreference) pinListDialogHeight();
+            }
+        }
+
+        /**
+         * ListPreference 的单选对话框用的是 ListView 的 wrap_content 高度。条目一多，
+         * 「列表量出内容高度 → 对话框重算 → 列表重绑 → 再量」会来回震荡，横屏（可见高度小）
+         * 时表现为窗口上下跳动。这里把列表限高到「可见区域减去标题栏和按钮栏」，
+         * 高度不再依赖内容，列表改为在对话框内部滚动。
+         */
+        private void pinListDialogHeight() {
+            handler.post(() -> {
+                Fragment fragment = getParentFragmentManager()
+                        .findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG");
+                if (!(fragment instanceof PreferenceDialogFragmentCompat)) return;
+                Dialog dialog = ((PreferenceDialogFragmentCompat) fragment).getDialog();
+                if (!(dialog instanceof AlertDialog)) return;
+                final ListView list = ((AlertDialog) dialog).getListView();
+                final View decor = dialog.getWindow() != null ? dialog.getWindow().getDecorView() : null;
+                if (list == null || decor == null) return;
+
+                decor.post(() -> {
+                    Rect visible = new Rect();
+                    decor.getWindowVisibleDisplayFrame(visible);
+                    if (visible.height() <= 0) return;
+
+                    float density = getResources().getDisplayMetrics().density;
+                    // 标题栏 + 按钮栏 + 上下留白，按 dp 估
+                    int reserved = (int)(120 * density);
+                    int maxListHeight = Math.max((int)(120 * density), visible.height() - reserved);
+
+                    ListAdapter adapter = list.getAdapter();
+                    if (adapter == null || adapter.getCount() == 0) return;
+
+                    int contentHeight;
+                    try {
+                        View row = adapter.getView(0, null, list);
+                        if (row == null) return;
+                        int width = list.getWidth() > 0 ? list.getWidth() : visible.width();
+                        row.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.AT_MOST),
+                                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                        contentHeight = row.getMeasuredHeight() * adapter.getCount()
+                                + list.getDividerHeight() * Math.max(0, adapter.getCount() - 1);
+                    }
+                    catch (Exception e) {
+                        return;
+                    }
+
+                    // 放得下就不动它
+                    if (contentHeight <= maxListHeight) return;
+
+                    ViewGroup.LayoutParams params = list.getLayoutParams();
+                    if (params == null || params.height == maxListHeight) return;
+                    params.height = maxListHeight;
+                    list.setLayoutParams(params);
+                });
+            });
         }
     }
 

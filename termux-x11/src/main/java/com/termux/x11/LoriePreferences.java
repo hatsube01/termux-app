@@ -105,7 +105,7 @@ public class LoriePreferences extends AppCompatActivity implements PreferenceFra
     protected TouchpadView touchpadView;
     protected Runnable editInputControlsCallback;
     protected Shortcut shortcut;
-    protected DownloadProgressDialog preloaderDialog;
+    public DownloadProgressDialog preloaderDialog;
     protected Callback<Uri> openFileCallback;
     protected float globalCursorSpeed = 1.0f;
     protected ControlsProfile profile;
@@ -618,6 +618,7 @@ public class LoriePreferences extends AppCompatActivity implements PreferenceFra
             Log.e("Preferences", "changed preference: " + key);
             handler.removeCallbacks(updateLayout);
             handler.postDelayed(updateLayout, 50);
+
 
             if ("displayScale".contentEquals(key)) {
                 int scale = (Integer) newValue;
@@ -1160,6 +1161,11 @@ public class LoriePreferences extends AppCompatActivity implements PreferenceFra
     }
 
     //inout control
+    /** 避免与 TermuxActivity.getPreferences() 冲突，故使用独立命名 */
+    public SharedPreferences getX11Preferences() {
+        return PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
     public InputControlsView getInputControlsView() {
         return inputControlsView;
     }
@@ -1237,12 +1243,11 @@ public class LoriePreferences extends AppCompatActivity implements PreferenceFra
             inputControlsView.setShowTouchscreenControls(cbShowTouchscreenControls.isChecked());
             int position = sProfile.getSelectedItemPosition();
             if (position > 0) {
-                if (cbEnableTouchScreen.isChecked()) {
-                    touchpadView.setTouchMode(TouchpadView.TouchMode.TOUCH_SCREEN);
-                } else {
-                    touchpadView.setTouchMode(TouchpadView.TouchMode.TRACK_PAD);
-                }
-                showInputControls(inputControlsManager.getProfiles().get(position - 1));
+                ControlsProfile targetProfile = inputControlsManager.getProfiles().get(position - 1);
+                // 勾选=直接触屏(V1)，否则沿用该按键配置里的触控板模式
+                touchpadView.setTouchpadMode(cbEnableTouchScreen.isChecked()
+                        ? TouchpadView.TOUCHPAD_MODE_V1 : targetProfile.getTouchpadMode());
+                showInputControls(targetProfile);
             } else {
                 hideInputControls();
             }

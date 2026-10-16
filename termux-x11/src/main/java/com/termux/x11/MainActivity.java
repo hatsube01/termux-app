@@ -305,7 +305,8 @@ public class MainActivity extends LoriePreferences {
     private void setupInputController() {
         xServer = getLorieView();
         globalCursorSpeed = 1.0f;
-        touchpadView = new TouchpadView(this, xServer);
+        touchpadView = new TouchpadView(this, xServer, PreferenceManager.getDefaultSharedPreferences(getBaseContext())
+                .getBoolean("capture_pointer_on_external_mouse", false));
         touchpadView.setSensitivity(globalCursorSpeed);
         touchpadView.setVisibility(View.GONE);
 //        touchpadView.setBackground(getDrawable(R.drawable.touchpad_background));

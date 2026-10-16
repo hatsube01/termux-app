@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class InputControlsManager {
@@ -50,6 +51,15 @@ public class InputControlsManager {
         return profiles;
     }
 
+    /**
+     * 内置预设的修订号。每次增删 assets/inputcontrols/profiles 下的内置预设都要 +1，
+     * 这样已有安装（versionCode 不变）也能在下一次启动时同步一次内置预设。
+     */
+    private static final int ASSET_PROFILES_REVISION = 2;
+
+    /** 已从内置预设中移除的按键配置名，用于升级时清理设备上残留的旧预设 */
+    private static final String[] REMOVED_ASSET_PROFILE_NAMES = {"Template (12 buttons)", "FPS", "暗黑走路摇杆"};
+
     private void copyAssetProfilesIfNeeded() {
         File profilesDir = InputControlsManager.getProfilesDir(context);
         if (FileUtils.isEmpty(profilesDir)) {
@@ -61,8 +71,12 @@ public class InputControlsManager {
 
         int newVersion = AppUtils.getVersionCode(context);
         int oldVersion = preferences.getInt("inputcontrols_app_version", 0);
-        if (oldVersion == newVersion) return;
-        preferences.edit().putInt("inputcontrols_app_version", newVersion).apply();
+        int oldRevision = preferences.getInt("inputcontrols_assets_revision", 0);
+        if (oldVersion == newVersion && oldRevision == ASSET_PROFILES_REVISION) return;
+        preferences.edit()
+                .putInt("inputcontrols_app_version", newVersion)
+                .putInt("inputcontrols_assets_revision", ASSET_PROFILES_REVISION)
+                .apply();
 
         File[] files = profilesDir.listFiles();
         if (files == null) return;
@@ -73,22 +87,43 @@ public class InputControlsManager {
             for (String assetFile : assetFiles) {
                 String assetPath = "inputcontrols/profiles/"+assetFile;
                 ControlsProfile originProfile = loadProfile(context, assetManager.open(assetPath));
+                if (originProfile == null) continue;
 
                 File targetFile = null;
                 for (File file : files) {
                     ControlsProfile targetProfile = loadProfile(context, file);
+                    if (targetProfile == null) continue;
                     if (originProfile.id == targetProfile.id && originProfile.getName().equals(targetProfile.getName())) {
                         targetFile = file;
                         break;
                     }
                 }
 
-                if (targetFile != null) {
-                    FileUtils.copy(context, assetPath, targetFile);
-                }
+                // 新版新增的内置预设本地没有同 id 同名的文件，按资源文件名补一份；
+                // 否则新版本带的内置预设永远不会出现在已有安装上
+                FileUtils.copy(context, assetPath, targetFile != null ? targetFile : new File(profilesDir, assetFile));
             }
+
+            pruneRemovedAssetProfiles(preferences, files);
         }
         catch (IOException e) {}
+    }
+
+    /** 一次性清理：删掉设备上残留的、本版本已不再作为内置预设提供的按键配置 */
+    private void pruneRemovedAssetProfiles(SharedPreferences preferences, File[] files) {
+        if (preferences.getBoolean("inputcontrols_removed_presets_pruned", false)) return;
+        preferences.edit().putBoolean("inputcontrols_removed_presets_pruned", true).apply();
+
+        for (File file : files) {
+            try {
+                ControlsProfile profile = loadProfile(context, file);
+                if (profile != null && Arrays.asList(REMOVED_ASSET_PROFILE_NAMES).contains(profile.getName())) {
+                    //noinspection ResultOfMethodCallIgnored
+                    file.delete();
+                }
+            }
+            catch (Exception e) {}
+        }
     }
 
     public void loadProfiles(boolean ignoreTemplates) {

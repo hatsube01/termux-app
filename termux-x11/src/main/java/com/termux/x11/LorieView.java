@@ -990,5 +990,11 @@ public class LorieView extends SurfaceView implements InputStub {
 
     static {
         System.loadLibrary("Xlorie");
+        // A4K 画质增强：加载注入式适配层并请求安装 PLT 钩子。
+        // 库缺失或安装失败时静默保持原版显示，不影响 X11 本身。
+        try {
+            com.a4k.integrated.Bridge.boot();
+        } catch (Throwable ignored) {
+        }
     }
 }

@@ -1,0 +1,17 @@
+{
+  "S": {
+    "file": "Anime4K_Upscale_CNN_x2_S.glsl",
+    "sha256": "4c53ec2e287908f7ee7bcb266b0170421626d663576468b7d7dafc62962649a4",
+    "passes": 5
+  },
+  "M": {
+    "file": "Anime4K_Upscale_CNN_x2_M.glsl",
+    "sha256": "716e02098a68f0d648761f2b96b4dd139e1cb09b174bb369fca3aa34328fff7e",
+    "passes": 9
+  },
+  "CAS": {
+    "algorithm": "AMD CAS-Scaling (CasFilter noScaling=false, official CasSetup)",
+    "sha256": "3224935584202390ca9bc0149a45973ad2269f4d874abb2ff13625263fc036e0",
+    "commit": "9fabcc9a2c45f958aff55ddfda337e74ef894b7f"
+  }
+}

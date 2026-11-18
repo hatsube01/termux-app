@@ -1,0 +1,14 @@
+{
+  "ArtCNN_C4F16.glsl": {
+    "sha256": "03d0b3d31cb82c898a94a46663021a3e8f02c5a21d69c5cfdf0208de4bfd453e",
+    "commit": "a1b6ace035df4a9e9a113713dd7ee4eb92dd67ea"
+  },
+  "ffx_fsr1.h": {
+    "sha256": "93c3922362ea7fc99cbcc698ca30c98de4f8c246d1fbb0b09e015ddef38ce3a5",
+    "commit": "a21ffb8f6c13233ba336352bdff293894c706575"
+  },
+  "ffx_fsr_a.h": {
+    "sha256": "f60e2722fcd13989523b9164d776ab382b3692791767f3bf8bb19967f763f3fb",
+    "commit": "a21ffb8f6c13233ba336352bdff293894c706575"
+  }
+}

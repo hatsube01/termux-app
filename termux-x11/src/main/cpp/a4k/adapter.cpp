@@ -91,7 +91,12 @@ void draw(GLenum kind,GLint first,GLsizei count){
   frame.x=q.view[0]+int(lroundf((xmin+1)*q.view[2]*.5f));frame.y=q.view[1]+int(lroundf((ymin+1)*q.view[3]*.5f));frame.w=int(lroundf((xmax-xmin)*q.view[2]*.5f));frame.h=int(lroundf((ymax-ymin)*q.view[3]*.5f));
   a4k::Options options{mode.load(),quality.load(),sharpness.load(),split.load()!=0,scale.load()};frame.detectedOrder=q.detectedOrder;int requested=colorOrder.load();frame.usedOrder=requested?requested:(q.detectedOrder?q.detectedOrder:1);
   frame.pipeline->setSourceFrame(++frame.serial);double prepAt=a4k::Pipeline::now();bool ready=iw>0&&ih>0&&frame.w>0&&frame.h>0&&frame.pipeline->prepareCapture(iw,ih);frame.capturePrepareMs=frame.prepareMs=a4k::Pipeline::now()-prepAt;
-  double captureAt=a4k::Pipeline::now();frame.pending=ready&&frame.pipeline->capture(q.texture,crop,frame.usedOrder==2);frame.iw=iw;frame.ih=ih;frame.capturedOptions=options;frame.overlays.clear();
+  double captureAt=a4k::Pipeline::now();frame.pending=ready&&frame.pipeline->capture(q.texture,crop,frame.usedOrder==2);
+  // frame.iw/ih 与 frame.w/h 只在 lorie 真正改变渲染尺寸时才会变（例如分辨率设置）。
+  // 捏合缩放不会走到这里：Renderer 适配层只记录触摸换算状态，原生 lorie 的渲染尺寸不变，
+  // 所以手势过程中不会触发 prepare() 或纹理重分配。若将来让捏合改变渲染尺寸，
+  // 必须在这里加尺寸稳定（连续若干帧相同才重建），否则每帧重分配会直接把帧率打穿。
+  frame.iw=iw;frame.ih=ih;frame.capturedOptions=options;frame.overlays.clear();
   // Do not defer this producer-ownership barrier without a proven release
   // protocol. Two private snapshots alone cannot protect a reused source.
   if(frame.pending)glFinish();frame.captureMs=a4k::Pipeline::now()-captureAt;

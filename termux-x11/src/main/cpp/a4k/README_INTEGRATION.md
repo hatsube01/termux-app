@@ -18,6 +18,15 @@ a4k/upstream/                         pipeline.cpp 用相对路径引用的 FFX 
 4. 钩子装上后：`glDrawArrays` 里只做一次私有快照（锁内），
    `eglSwapBuffers` 里做多 pass 增强并呈现（锁外）。
 
+## 与捏合缩放的关系
+
+终端侧由原生 lorie 渲染。`com.termux.x11.controller.renderer.Renderer` 只是适配层，
+记录 `pinchZoom` / 锚点供触摸板换算，**不参与渲染**。因此捏合时 `frame.iw/ih`、`frame.w/h`
+保持不变，适配层不会重新 `prepare()` 或重分配纹理。
+
+> 如果将来把捏合改成真正改变渲染尺寸，`adapter.cpp` 的 `draw()` 里必须加尺寸稳定
+> （连续若干帧尺寸一致才重建），否则每帧重分配会让捏合过程掉帧。代码里已留注释。
+
 ## 尚未接入（重要）
 
 | 项 | 状态 | 原因 |

@@ -4,7 +4,8 @@ import com.termux.x11.LorieView;
 
 /**
  * 终端侧适配层：LorieView 由原生 lorie 渲染，没有 winlator 的 GLRenderer。
- * 这里只保留触摸板坐标换算需要的状态，捏合缩放不改变实际渲染（降级行为）。
+ * 这里只保留触摸板坐标换算需要的状态：捏合缩放只影响触摸坐标换算，
+ * 渲染尺寸由原生 lorie 决定，不随捏合改变。
  */
 public class Renderer {
     private final LorieView xServer;
